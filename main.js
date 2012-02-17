@@ -1,22 +1,24 @@
-c.width = 600;
-c.height = 600;
+c.width = c.height = 600;
 
+m = Math
 //offset between moves
 d = [[-1,0],//left
 	 [0, -1],//up
 	 [1,0],//right
 	 [0,1]];//down
 
-i = 2; // current offset index
+i = j = 2; // i is current offset index, j isopponent snake offset index
+var s,o; // s is varaible that holds our snake o is reference to opponent snake
 
-s = null; // this will ve stored as a linked list
 
-//colors that was used in game
+
+// colors that was used in game
 k = [
     '#000',
     '#00f',
     '#f00'];
 
+// used for heart animation
 x = 0;
 //draws a black rectangle to given location
 function fillRect(x,y,height,width,color){
@@ -33,7 +35,7 @@ function cons(x,y,next){
 }
 
 //create a random number with given max value
-function getrandom(max){return Math.floor(Math.random()*max);}
+function getrandom(max){return m.floor(m.random()*max);}
 
 //remove last node from snake and erease it from screen
 function removeLast(current, last){
@@ -74,44 +76,57 @@ function createPoint(){
     }
 }
 
-//main loop
-function loop(){
-    // if we are startin the game do just set starting values
+function movesnake(snake,offset,opponent){
+    // if we are starting the game do just set starting values
     // pass main logic
-    if(s){
+    if(snake){
 	//add a new node to snake
-	s = cons((s.x + d[i][0])%30, // mod 30 makes sure that if we get out of the screen get it snake back from index 0
-		     ((s.y-1 + d[i][1])%30)+1,
-		     s);
+	snake = cons((snake.x + d[offset][0])%30, // mod 30 makes sure that if we get out of the screen get it snake back from index 0
+		     ((snake.y-1 + d[offset][1])%30)+1,
+		     snake);
 	//if snake is going below 0
 	//just make it re-enter from other side of the screen
-	if(s.x<0) s.x = 29;
-	if(s.y<1) s.y = 30;
+	if(snake.x<0) snake.x = 29;
+	if(snake.y<1) snake.y = 30;
 
 	//if we eat point create another point and not remove last node
-	if((s.x == p.x) && (s.y == p.y))
+	if((snake.x == p.x) && (snake.y == p.y))
 	    createPoint();
 	else
-	    removeLast(s,s.n);
+	    removeLast(snake,snake.n);
 	//draw newly created node
-	fillRect(s.x,s.y,1,1,1);
+	fillRect(snake.x,snake.y,1,1,1);
 	drawHeart()
 	//if head is overloping any other node restart game
-	if(hasItem(s.n,s))
-	    s = null;
+	if(hasItem(snake.n,snake) || hasItem(opponent,snake))
+	    snake = null;
     }
+    return snake;
+}
+
+//main loop
+function loop(){
+    s = movesnake(s,i,o,0);
+    if(s){
+	if((j%2) && p.y == o.y)
+	    j = (o.x - p.x)>0?0:2
+	if(!(j%2) && p.x == o.x)
+	    j = (o.y - p.y)>0?1:3
+    }
+    o = movesnake(o,j,s,1);
     //set default values for game
-    if(!s){
-	i = 2;
-        s= cons(5,1);
+    if(!s || !o){
+	i = j= 2;
+        s= cons(5,5);
+	o = cons(5,25);
 	fillRect(0,1,30,30,0);
 	createPoint();
     }
-    changed=false;//this variable makes sure that we are doing only one move on every turn
+    changed=0;//this variable makes sure that we are doing only one move on every turn
     setTimeout(loop,100);    
 }
 
-window.onload = function(){
+(function(){
     document.addEventListener('keydown', function(e){
 	//37 = left arrow
 	//38 = up arrow
@@ -123,9 +138,9 @@ window.onload = function(){
 	   (val<4)&&
 	   (val>=0)&&
 	  (! changed)){
-	    changed=true;
+	    changed=1;
 	    i = val;
 	}
     }, false);
     loop();
-};
+}());
