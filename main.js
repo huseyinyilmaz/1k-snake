@@ -10,8 +10,6 @@ d = [[-1,0],//left
 i = j = 2; // i is current offset index, j isopponent snake offset index
 var s,o; // s is varaible that holds our snake o is reference to opponent snake
 
-
-
 // colors that was used in game
 k = [
     '#000',
@@ -54,10 +52,10 @@ function hasItem(list,node){
 
 function drawHeart(){
     fillRect(p.x,p.y,1,1,0);
-    x = ++x%5;
+    x = ++x%6;
     a.font = 13 + x +"pt Calibri";
     a.fillStyle = k[2];
-    a.fillText('♥', p.x*20, p.y*20);
+    a.fillText('♥', p.x*20, p.y*20-1);
 }
 
 //create a random point on screen for snake to collect 
