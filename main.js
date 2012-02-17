@@ -16,7 +16,8 @@ var s,o; // s is varaible that holds our snake o is reference to opponent snake
 k = [
     '#000',
     '#00f',
-    '#f00'];
+    '#f00',
+    '#0f0'];
 
 // used for heart animation
 x = 0;
@@ -48,12 +49,7 @@ function removeLast(current, last){
 // check if given node memver of given list
 // comparison is done by location only
 function hasItem(list,node){
-    if(! list)
-	return false;
-    if(node.x == list.x && node.y == list.y)
-	return true;
-    else
-	return hasItem(list.n,node);
+    return !list?false:node.x == list.x && node.y == list.y?1:hasItem(list.n,node);
 }
 
 function drawHeart(){
@@ -76,44 +72,37 @@ function createPoint(){
     }
 }
 
-function movesnake(snake,offset,opponent){
+function movesnake(snake,offset,opponent,color){
     // if we are starting the game do just set starting values
     // pass main logic
     if(snake){
 	//add a new node to snake
-	snake = cons((snake.x + d[offset][0])%30, // mod 30 makes sure that if we get out of the screen get it snake back from index 0
-		     ((snake.y-1 + d[offset][1])%30)+1,
+	snake = cons(((snake.x + d[offset][0])+30)%30, // mod 30 makes sure that if we get out of the screen get it snake back from index 0
+		     (((snake.y-1 + d[offset][1])+30)%30)+1,
 		     snake);
-	//if snake is going below 0
-	//just make it re-enter from other side of the screen
-	if(snake.x<0) snake.x = 29;
-	if(snake.y<1) snake.y = 30;
-
 	//if we eat point create another point and not remove last node
-	if((snake.x == p.x) && (snake.y == p.y))
-	    createPoint();
-	else
-	    removeLast(snake,snake.n);
+	(snake.x == p.x) && (snake.y == p.y)?createPoint():removeLast(snake,snake.n);
 	//draw newly created node
-	fillRect(snake.x,snake.y,1,1,1);
+	fillRect(snake.x,snake.y,1,1,color);
 	drawHeart()
 	//if head is overloping any other node restart game
 	if(hasItem(snake.n,snake) || hasItem(opponent,snake))
-	    snake = null;
+	    snake = 0;
     }
     return snake;
 }
 
 //main loop
 function loop(){
-    s = movesnake(s,i,o,0);
+    s = movesnake(s,i,o,1);
+    
     if(s){
 	if((j%2) && p.y == o.y)
 	    j = (o.x - p.x)>0?0:2
 	if(!(j%2) && p.x == o.x)
 	    j = (o.y - p.y)>0?1:3
     }
-    o = movesnake(o,j,s,1);
+    o = movesnake(o,j,s,3);
     //set default values for game
     if(!s || !o){
 	i = j= 2;
@@ -125,6 +114,7 @@ function loop(){
     changed=0;//this variable makes sure that we are doing only one move on every turn
     setTimeout(loop,100);    
 }
+
 
 (function(){
     document.addEventListener('keydown', function(e){
