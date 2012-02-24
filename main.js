@@ -1,3 +1,8 @@
+/*
+ * Classic snake game. Collect hearts before your opponent do. Use
+ * arrow keys to control your snake.
+ */
+
 c.width = c.height = 600;
 m = Math;
 //offset between moves
@@ -11,11 +16,12 @@ s = o = 0; // s is varaible that holds our snake o is reference to opponent snak
 // colors that was used in game
 k = '#000';
 // used for heart animation
+
 x = 0;
 //draws a black rectangle to given location
 function fillRect(x,y,height,width,color){
     a.fillStyle = color;
-    a.fillRect(x*20,(y-1)*20,width*20,height*20);
+    a.fillRect(x*20,y*20,width*20,height*20);
 }
 
 //construct a new node for linked list
@@ -46,14 +52,14 @@ function drawHeart(){
     x = ++x%6;
     a.font = 13 + x +"pt Calibri";
     a.fillStyle = '#f00';
-    a.fillText('♥', p.x*20, p.y*20-1);
+    a.fillText('♥', p.x*20, (p.y+1)*20);
 }
 
 
 //create a random point on screen for snake to collect 
 function createPoint(){
     p ={x : m.floor(m.random()*30),
-	y : m.floor(m.random()*30)+1};
+	y : m.floor(m.random()*30)};
     //if point is on snake create another one else draw it on screen
     hasItem(s,p)||hasItem(o,p)?createPoint():drawHeart();
 }
@@ -61,7 +67,7 @@ function createPoint(){
 
 function getHead(snake,offset){
     var res = cons(((snake.x + d[offset][0])+30)%30, // mod 30 makes sure that if we get out of the screen get it snake back from index 0
-		   (((snake.y-1 + d[offset][1])+30)%30)+1,
+		   (((snake.y + d[offset][1])+30)%30),
 		   snake);
     return (hasItem(s,res) || hasItem(o,res))?0:res;
 }
@@ -69,16 +75,15 @@ function getHead(snake,offset){
 function movesnake(snake,offset,color){
     // if we are starting the game do just set starting values
     // pass main logic
-    if(snake){
 	//add a new node to snake
-	snake = getHead(snake,offset);
+	snake = snake?getHead(snake,offset):0;
 	if(snake){
 	    //if we eat point create another point and not remove last node
 	    (snake.x == p.x) && (snake.y == p.y)?createPoint():removeLast(snake,snake.n);
 	    //draw newly created node
 	    fillRect(snake.x,snake.y,1,1,color);
 	    }
-    }
+
     return snake;
 }
 
@@ -112,12 +117,11 @@ function loop(){
     //set default values for game
     if(!s || !o){
 	i = j= 2;
-        s= cons(5,5,0);
+        s= cons(5,0,0);
 	o = cons(5,25,0);
-	fillRect(0,1,30,30,k);
+	fillRect(0,0,30,30,k);
 	createPoint();
     }
-    //Animate heart
     drawHeart();
     h=0;//this variable makes sure that we are doing only one move on every turn //set system unchanged
     setTimeout(loop,100);    
@@ -133,12 +137,11 @@ function loop(){
 	var val = e.keyCode - 37;
 	
 	if(((val - i) % 2)&& //new value is not same of opposite direction
-	   val<4 && //value is between 0 and 4
-	   val>=0 &&
+	   d[val] &&
 	   !h){//there was no move at current loop
 	    h=1;// set system changed
 	    i = val;
 	}
-    }, 0);
+    }, false);
     loop();
 }());
