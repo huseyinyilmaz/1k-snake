@@ -11,13 +11,10 @@ d = [[-1,0],//left
      [1,0],//right
      [0,1]];//down
 i = j = 2; // i is current offset index, j isopponent snake offset index
-s = o = 0; // s is varaible that holds our snake o is reference to opponent snake
+s = o = x = 0; // s is varaible that holds our snake o is reference to opponent snake, x used for heart animation
 
 // colors that was used in game
 k = '#000';
-// used for heart animation
-
-x = 0;
 //draws a black rectangle to given location
 function fillRect(x,y,height,width,color){
     a.fillStyle = color;
@@ -49,8 +46,8 @@ function hasItem(list,node){
 
 function drawHeart(){
     fillRect(p.x,p.y,1,1,k);
-    x = ++x%6;
-    a.font = 13 + x +"pt Calibri";
+    x = ++x%4;
+    a.font = 15 + x + "pt Calibri";
     a.fillStyle = '#f00';
     a.fillText('♥', p.x*20, (p.y+1)*20);
 }
@@ -92,13 +89,13 @@ function loop(){
     s = movesnake(s,i,'#00f');
     // move opponent
     if(s){
-	
 	var minimum = 99,
-            min_index = 0;
+            min_index;
 	
 	for(val=j+3;val<j+6;++val){
 	    var head=getHead(o,val%4),
 	        distance=head?m.abs(head.x-p.x)+m.abs(head.y-p.y):99;
+	    
 	    if(minimum>=distance){
 		minimum=distance;
 		min_index=val;
@@ -117,8 +114,8 @@ function loop(){
     //set default values for game
     if(!s || !o){
 	i = j= 2;
-        s= cons(5,0,0);
-	o = cons(5,25,0);
+        s= cons(5,9,0);
+	o = cons(5,21,0);
 	fillRect(0,0,30,30,k);
 	createPoint();
     }
